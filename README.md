@@ -2,7 +2,7 @@
 
 **The ultimate mod for Project Highrise.** Upward is a [BepInEx 5](https://github.com/BepInEx/BepInEx) plugin that makes your tower feel alive at night and removes a lot of the tedious clicking from building — without replacing the original game.
 
-> Version 0.1.0 · Project Highrise (Steam, Windows) · BepInEx 5.4.23 **x86**
+> Version 1.0.0 · Project Highrise (Steam, Windows) · BepInEx 5.4.23 **x86**
 
 ---
 
@@ -35,28 +35,29 @@ Every feature can be switched off or tuned in the config file (see [Configuratio
 
 ## Installation
 
-Upward needs **BepInEx 5, x86 (32-bit) build**. Project Highrise is a 32-bit game, so the x64 build will not load.
+The download already includes **BepInEx 5.4.23.2 (x86)**, the mod loader Upward runs on. You just extract one zip into the game folder.
 
-### 1. Install BepInEx
-1. Download **`BepInEx_win_x86_5.4.23.2.zip`** from the [BepInEx releases page](https://github.com/BepInEx/BepInEx/releases/tag/v5.4.23.2) (make sure it says **x86**).
+1. Download **`Upward-1.0.0.zip`** from the [Releases page](https://github.com/douglasrac/Upward/releases).
 2. Find your game folder: in Steam, right-click **Project Highrise → Manage → Browse local files**. It looks like
    `...\steamapps\common\Project Highrise\` and contains `Game.exe`.
-3. Extract the zip **into that folder**, so that `winhttp.dll`, `doorstop_config.ini` and the `BepInEx` folder sit next to `Game.exe`.
-4. Start the game once and quit. BepInEx will create `BepInEx\plugins`, `BepInEx\config` and `BepInEx\LogOutput.log`.
-
-### 2. Install Upward
-1. Download **`Upward-0.1.0.zip`** from the [Releases page](https://github.com/douglasrac/Upward/releases).
-2. Extract it into `Project Highrise\BepInEx\plugins\`. You should end up with:
+3. Extract the zip **into that folder** (allow it to merge folders). You should end up with:
    ```
    Project Highrise\
+   ├─ Game.exe
+   ├─ winhttp.dll            (BepInEx)
+   ├─ doorstop_config.ini    (BepInEx)
    └─ BepInEx\
+      ├─ core\               (BepInEx)
       └─ plugins\
          └─ Upward\
             ├─ Upward.dll
             ├─ sounds\
             └─ textures\
    ```
-3. Start the game. To check that it loaded, open `BepInEx\LogOutput.log` and look for a line like `Upward 0.1.0 carregado`.
+4. Start the game from Steam as usual. To check that it loaded, open `BepInEx\LogOutput.log` and look for a line like `Upward 1.0.0 carregado`.
+
+### Already have BepInEx?
+If you already use BepInEx 5 **x86** for other Project Highrise mods, download **`Upward-1.0.0-plugin-only.zip`** instead and extract it into `Project Highrise\BepInEx\plugins\`. Don't use the x64 build of BepInEx: Project Highrise is a 32-bit game, so it will not load.
 
 ### Uninstall
 Delete the `BepInEx\plugins\Upward` folder (and optionally `BepInEx\config\upward.projecthighrise.cfg`). To remove BepInEx entirely, also delete `winhttp.dll`, `doorstop_config.ini` and the `BepInEx` folder.
@@ -137,5 +138,5 @@ tools/             Python scripts used to generate, fit and import the art and s
 
 ## Credits
 - Shutter sounds: "Garage door closing/opening" by ezwa (PDSounds), Wikimedia Commons, public domain.
-- Built with [BepInEx](https://github.com/BepInEx/BepInEx) and [Harmony](https://github.com/pardeike/Harmony).
+- Built with [BepInEx](https://github.com/BepInEx/BepInEx) and [Harmony](https://github.com/pardeike/Harmony). The release zip includes BepInEx 5.4.23.2 unmodified (MIT license, see `BepInEx\LICENSE.txt`) and its Unity Doorstop loader `winhttp.dll` (LGPL-2.1, see `BepInEx\DOORSTOP_LICENSE.txt`; source at [NeighTools/UnityDoorstop](https://github.com/NeighTools/UnityDoorstop)).
 - Project Highrise is © SomaSim. This is an unofficial fan mod, not affiliated with or endorsed by SomaSim or Kasedo Games.
