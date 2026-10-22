@@ -2,7 +2,7 @@
 
 **The ultimate mod for Project Highrise.** Upward is a [BepInEx 5](https://github.com/BepInEx/BepInEx) plugin that makes your tower feel alive at night and removes a lot of the tedious clicking from building — without replacing the original game.
 
-> Version 1.0.0 · Project Highrise (Steam, Windows) · BepInEx 5.4.23 **x86**
+> Version 1.1.0 · Project Highrise (Steam, Windows) · BepInEx 5.4.23 **x86**
 
 ---
 
@@ -38,7 +38,7 @@ Every feature can be switched off or tuned in the config file (see [Configuratio
 
 The download already includes **BepInEx 5.4.23.2 (x86)**, the mod loader Upward runs on. You just extract one zip into the game folder.
 
-1. Download **`Upward-1.0.0.zip`** from the [Releases page](https://github.com/douglasrac/Upward/releases).
+1. Download **`Upward-1.1.0.zip`** from the [Releases page](https://github.com/douglasrac/Upward/releases).
 2. Find your game folder: in Steam, right-click **Project Highrise → Manage → Browse local files**. It looks like
    `...\steamapps\common\Project Highrise\` and contains `Game.exe`.
 3. Extract the zip **into that folder** (allow it to merge folders). You should end up with:
@@ -55,10 +55,10 @@ The download already includes **BepInEx 5.4.23.2 (x86)**, the mod loader Upward 
             ├─ sounds\
             └─ textures\
    ```
-4. Start the game from Steam as usual. To check that it loaded, open `BepInEx\LogOutput.log` and look for a line like `Upward 1.0.0 carregado`.
+4. Start the game from Steam as usual. To check that it loaded, open `BepInEx\LogOutput.log` and look for a line like `Upward 1.1.0 carregado`.
 
 ### Already have BepInEx?
-If you already use BepInEx 5 **x86** for other Project Highrise mods, download **`Upward-1.0.0-plugin-only.zip`** instead and extract it into `Project Highrise\BepInEx\plugins\`. Don't use the x64 build of BepInEx: Project Highrise is a 32-bit game, so it will not load.
+If you already use BepInEx 5 **x86** for other Project Highrise mods, download **`Upward-1.1.0-plugin-only.zip`** instead and extract it into `Project Highrise\BepInEx\plugins\`. Don't use the x64 build of BepInEx: Project Highrise is a 32-bit game, so it will not load.
 
 ### Uninstall
 Delete the `BepInEx\plugins\Upward` folder (and optionally `BepInEx\config\upward.projecthighrise.cfg`). To remove BepInEx entirely, also delete `winhttp.dll`, `doorstop_config.ini` and the `BepInEx` folder.
