@@ -413,6 +413,7 @@ namespace Upward
         private void DrawWindow(SessionContext ctx)
         {
             var rect = new Rect(WindowPosition(), new Vector2(270, 210));
+            GuiInputBlock.Add(rect);
             GUI.Box(rect, GUIContent.none, _box);
             GUILayout.BeginArea(new Rect(rect.x + 12, rect.y + 10, rect.width - 24, rect.height - 20));
 
@@ -515,7 +516,7 @@ namespace Upward
         }
 
         // Textura 8x8 com 2px de borda, esticada pelo GUIStyle.border
-        private static Texture2D Framed(Color32 fill, Color32 edge)
+        internal static Texture2D Framed(Color32 fill, Color32 edge)
         {
             var tex = new Texture2D(8, 8, TextureFormat.RGBA32, false);
             var px = new Color32[64];

@@ -45,10 +45,14 @@ namespace Upward
         internal static ConfigEntry<bool> DragBuildEnabled;
         internal static ConfigEntry<bool> FurnishAllEnabled;
 
+        internal static ConfigEntry<bool> AutoBookingEnabled;
+        internal static ConfigEntry<KeyCode> AutoBookingKey;
+
         internal static ConfigEntry<float> ServiceDemandMultiplier;
         internal static ConfigEntry<float> HotelServiceWorkersMultiplier;
 
         private readonly SoundproofPanel _soundproofPanel = new SoundproofPanel();
+        private readonly AutoBookingPanel _autoBookingPanel = new AutoBookingPanel();
         private StoreHours _storeHours;
         private readonly HeatmapTweaks _heatmapTweaks = new HeatmapTweaks();
         private readonly UtilityCapacity _utilityCapacity = new UtilityCapacity();
@@ -113,6 +117,12 @@ namespace Upward
                 "No Pick furnishings de quartos de hotel e apartamentos, Shift+clique numa opcao "
                 + "aplica a escolha a todos os espacos vagos do mesmo tipo no predio.");
 
+            AutoBookingEnabled = Config.Bind("Eventos", "BookingAutomatico", true,
+                "Salas de evento marcadas no painel reservam sozinhas o artista/evento corporativo disponivel "
+                + "mais barato quando ficam livres, com o preco de ingresso escolhido para cada sala.");
+            AutoBookingKey = Config.Bind("Eventos", "Tecla", KeyCode.F9,
+                "Tecla que abre e fecha o painel de booking automatico.");
+
             ServiceDemandMultiplier = Config.Bind("Servicos", "FrequenciaPedidos", 0.6f,
                 "Multiplica a chance de apartamentos e escritorios pedirem servicos (encanador, florista, TI, "
                 + "agua etc.). 1 = jogo original, 0.6 = 40% menos pedidos. Quartos de hotel nao mudam.");
@@ -139,6 +149,17 @@ namespace Upward
                 if (_loggedErrors.Add("gui" + ex.GetType().Name + ex.StackTrace))
                 {
                     Log.LogError("Erro no painel de laje antirruido: " + ex);
+                }
+            }
+            try
+            {
+                _autoBookingPanel.OnGUI();
+            }
+            catch (Exception ex)
+            {
+                if (_loggedErrors.Add("gui" + ex.GetType().Name + ex.StackTrace))
+                {
+                    Log.LogError("Erro no painel de booking automatico: " + ex);
                 }
             }
         }

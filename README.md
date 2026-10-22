@@ -25,6 +25,7 @@
 
 ### Noise, smell and services
 - **Soundproof floors.** A new button on the top-left HUD bar (next to the Grid button, or press **F8**) opens a panel where you can soundproof a floor. You pay per floor (200 per built floor tile by default); that floor's noise is cleared and no longer spreads to the floors above and below. Soundproofed floors are stored in your save.
+- **Auto booking for events.** In *Performer Booking*, the new **Auto booking** button (or press **F9**) lists every event space. Check the ones you want on autopilot and set each one's ticket price: whenever a checked space is free (cleaned and with nothing booked), it books the cheapest available performer or corporate event, just like doing it by hand. It only books when a performer suite is free for that day, so events are not cancelled for lack of a room. Choices are stored in your save.
 - **Restaurant smell stays on its floor.** Smell spreads sideways only, never up or down.
 - **Fewer service requests.** Apartments and offices ask for services (plumber, florist, IT, water...) 40% less often. Hotel rooms are not affected.
 - **More hotel staff.** Housekeeping, Room Service Kitchen and Luggage Service get 1.5× the workers, which also applies to services already built in old saves.
@@ -94,6 +95,8 @@ After the first launch with Upward, edit `BepInEx\config\upward.projecthighrise.
 | `Ruido` | `Tecla` | `F8` | Key that opens/closes the soundproof panel |
 | `Construcao` | `ArrastarSalas` | `true` | Drag to build rooms |
 | `Construcao` | `MobiliarTodos` | `true` | Shift+click to furnish all vacant spaces |
+| `Eventos` | `BookingAutomatico` | `true` | Auto booking panel for event spaces |
+| `Eventos` | `Tecla` | `F9` | Key that opens/closes the auto booking panel |
 | `Servicos` | `FrequenciaPedidos` | `0.6` | Service request frequency multiplier (1 = original game) |
 | `Servicos` | `FuncionariosHotel` | `1.5` | Hotel service staff multiplier (1 = original game) |
 
