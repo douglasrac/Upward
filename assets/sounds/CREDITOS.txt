@@ -1,0 +1,8 @@
+Sons do Upward
+
+shutter_close.wav  - "Garage door closing.ogg" por ezwa (PDSounds), Wikimedia Commons, dominio publico
+                     https://commons.wikimedia.org/wiki/File:Garage_door_closing.ogg
+shutter_open.wav   - "Garage door opening.ogg" por ezwa (PDSounds), Wikimedia Commons, dominio publico
+                     https://commons.wikimedia.org/wiki/File:Garage_door_opening.ogg
+
+Cortados e convertidos com tools/prepare_sounds.py.

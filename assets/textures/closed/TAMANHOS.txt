@@ -1,0 +1,137 @@
+Imagens de loja fechada - uma por tipo de loja
+
+Salve como <nome interno>.png nesta pasta (PNG). Sem imagem, a loja usa a porta de aco.
+Tamanho ideal = casas x 100 px de largura, andares x 300 px de altura.
+Pode desenhar no dobro (mais nitido no zoom maximo), sempre na mesma proporcao.
+
+Imagem (px)  Casas x andares  Nome interno                                    Nome no jogo (ingles)
+--------------------------------------------------------------------------------------------------------------
+300 x 300    3 x 1            vending-news                                    vending.news.name
+300 x 300    3 x 1            vending-shoeshine                               Shoe Shine Station
+300 x 300    3 x 1            vending-snacks                                  vending.snacks.name
+400 x 300    4 x 1            consultant-aesthetics                           Interior Decorator
+400 x 300    4 x 1            restaurant-level-one-a                          Cafe and Bakery
+400 x 300    4 x 1            restaurant-level-one-b                          Take-out
+400 x 300    4 x 1            restaurant-level-one-c                          Pre-made lunch
+400 x 300    4 x 1            restaurant-level-one-d                          Cafe
+400 x 300    4 x 1            restaurant-level-one-e                          Sandwich shop
+400 x 300    4 x 1            restaurant-level-one-g                          Ice Cream Stand
+400 x 300    4 x 1            restaurant-level-one-h                          Smoothie Bar
+400 x 300    4 x 1            restuarant-level-one-f                          Donut Shop
+400 x 300    4 x 1            service-hotel-luggage                           Luggage Drop
+400 x 300    4 x 1            service-retail-amenity-art                      Art Demo Booth
+400 x 300    4 x 1            service-retail-amenity-car                      Concept Car Demo Booth
+400 x 300    4 x 1            service-retail-amenity-knives                   Knife Demo Booth
+400 x 300    4 x 1            service-retail-amenity-wine                     Wine Tasting Demo Booth
+400 x 300    4 x 1            service-retail-mall-information                 Mall Customer Support
+500 x 300    5 x 1            service-hotel-eventprep                         Event Setup
+500 x 300    5 x 1            service-level-one-cleaning                      Janitors
+500 x 300    5 x 1            service-level-one-copies                        Copy  Center
+500 x 300    5 x 1            service-level-one-copies-tutorial               Copy  Center
+500 x 300    5 x 1            service-level-one-courier                       Courier
+500 x 300    5 x 1            service-level-one-courier-tutorial              Courier
+500 x 300    5 x 1            service-level-one-supplies                      Office Supplies
+500 x 300    5 x 1            service-level-one-water                         Bottled Water
+500 x 300    5 x 1            service-residential-cp2-packages                Package Delivery
+500 x 300    5 x 1            service-residential-cp2-recycling               Recycling Pick-up Services
+500 x 300    5 x 1            service-residential-cp2-trash                   Trash Pick-up
+500 x 300    5 x 1            service-residential-one-handyman                Handyman
+500 x 300    5 x 1            service-residential-one-laundry                 Laundromat
+500 x 300    5 x 1            service-residential-one-plumber                 Plumbing Services
+600 x 300    6 x 1            service-residential-cp2-bathroom                Communal Bathroom
+600 x 300    6 x 1            service-retail-mall-security                    Mall Security Services
+700 x 300    7 x 1            retail-level-one-a                              Convenience Store
+700 x 300    7 x 1            retail-level-one-b                              Mobile Phone Store
+700 x 300    7 x 1            retail-level-one-c                              Newsstand
+700 x 300    7 x 1            retail-level-one-d                              Drugstore
+700 x 300    7 x 1            retail-level-one-e-bottle                       Wine and Spirits
+700 x 300    7 x 1            retail-level-one-e-flowers                      Flower store
+700 x 300    7 x 1            retail-level-one-f                              Sunglass Shop
+700 x 300    7 x 1            retail-level-one-g                              Record Store
+700 x 300    7 x 1            retail-level-one-h                              retail.one.h.cat
+700 x 300    7 x 1            retail-level-one-i                              Pet Store
+700 x 300    7 x 1            retail-level-one-j                              Watch and Jewelry Repair
+800 x 300    8 x 1            consultant-building                             Building Manager
+800 x 300    8 x 1            restaurant-level-two-a                          Fast food
+800 x 300    8 x 1            restaurant-level-two-b                          Gourmet Sandwiches
+800 x 300    8 x 1            restaurant-level-two-c                          Hot Bar
+800 x 300    8 x 1            restaurant-level-two-d                          Diner
+800 x 300    8 x 1            restaurant-level-two-e                          Pizzeria
+800 x 300    8 x 1            restaurant-level-two-f                          Overnight Diner
+800 x 300    8 x 1            restaurant-level-two-g                          British Pub
+800 x 300    8 x 1            restaurant-level-two-h                          rest.two.h.cat
+800 x 300    8 x 1            retail-level-four-a                             China Shop
+800 x 300    8 x 1            retail-level-four-b                             Cosmetics Boutique
+800 x 300    8 x 1            retail-level-four-c                             Jeweler
+800 x 300    8 x 1            retail-level-four-d                             Jeweler
+800 x 300    8 x 1            retail-level-four-e                             Rare Book Dealer
+800 x 300    8 x 1            retail-level-four-f                             Fine Wine Broker
+800 x 300    8 x 1            retail-level-four-g                             Candle and Soap Store
+900 x 300    9 x 1            consultant-tourism                              Resort Manager
+900 x 300    9 x 1            service-hotel-housekeeping-small                Small Housekeeping
+900 x 300    9 x 1            service-hotel-roomservice-small                 Small Room Service Kitchen
+900 x 300    9 x 1            service-hotel-spa                               Hotel Spa
+900 x 300    9 x 1            service-level-two-catering                      Caterers
+900 x 300    9 x 1            service-level-two-computers                     Computer and IT Repair
+900 x 300    9 x 1            service-level-two-printer                       Commercial Printers
+900 x 300    9 x 1            service-level-two-storage                       File Storage
+900 x 300    9 x 1            service-residential-two-cleaners                Home Cleaners
+900 x 300    9 x 1            service-residential-two-dogs                    Dog Walkers
+1000 x 300   10 x 1           consultant-aesthetics-dealer                    Art Dealer
+1000 x 300   10 x 1           consultant-civics                               Lobbyist
+1000 x 300   10 x 1           service-residential-four-decorator              Home Decorators
+1000 x 300   10 x 1           service-residential-four-finance                Wealth Advisers
+1000 x 300   10 x 1           service-residential-four-yoga                   Yoga Studio
+1200 x 300   12 x 1           casino-small                                    Small casino floor
+1200 x 300   12 x 1           consultant-aesthetics-gallery                   Art Gallery
+1200 x 300   12 x 1           restaurant-roof-small                           Rooftop Beer Garden
+1200 x 300   12 x 1           retail-level-two-a                              Clothing Store
+1200 x 300   12 x 1           retail-level-two-b                              Electronics Store
+1200 x 300   12 x 1           retail-level-two-c-purses                       Purses and briefcases
+1200 x 300   12 x 1           retail-level-two-c-shoes                        Shoe Store
+1200 x 300   12 x 1           retail-level-two-d                              Housewares
+1200 x 300   12 x 1           retail-level-two-e                              Cheese Shop
+1200 x 300   12 x 1           retail-level-two-f                              Candy Store
+1200 x 300   12 x 1           retail-level-two-g                              Swimwear Outlet
+1200 x 300   12 x 1           retail-level-two-h                              Beauty Salon
+1200 x 300   12 x 1           retail-level-two-i                              retail.two.i.cat
+1200 x 300   12 x 1           retail-level-two-j                              Bank Branch
+1200 x 300   12 x 1           service-residential-three-daycare               Daycare Center
+1200 x 300   12 x 1           service-residential-three-dogdaycare            Dog Sitters
+1200 x 300   12 x 1           service-residential-three-drycleaning           Dry Cleaners
+1200 x 300   12 x 1           service-residential-three-flowers               Florist
+1200 x 300   12 x 1           service-residential-three-gym                   Personal Trainer
+1200 x 300   12 x 1           service-residential-three-tailor                Tailor
+1200 x 300   12 x 1           service-retail-amenity-observation              Observation Deck
+1400 x 300   14 x 1           restaurant-level-four-a                         Chinese Restaurant
+1400 x 300   14 x 1           restaurant-level-four-b                         
+1400 x 300   14 x 1           restaurant-level-four-c                         Seafood Restaurant
+1400 x 300   14 x 1           restaurant-level-four-d                         Thai Restaurant
+1400 x 300   14 x 1           restaurant-level-four-e                         Japanese Restaurant
+1400 x 300   14 x 1           restaurant-level-four-f                         French Restaurant
+1400 x 300   14 x 1           restaurant-level-four-g                         Cocktail Lounge
+1500 x 300   15 x 1           service-hotel-housekeeping-large                Large Housekeeping
+1500 x 300   15 x 1           service-hotel-roomservice-large                 Large Room Service Kitchen
+1600 x 300   16 x 1           restaurant-level-three-a                        Sports Bar
+1600 x 300   16 x 1           restaurant-level-three-b-italian                Italian Restaurant
+1600 x 300   16 x 1           restaurant-level-three-b-mexican                Mexican Restaurant
+1600 x 300   16 x 1           restaurant-level-three-c-brunch                 Brunch Spot
+1600 x 300   16 x 1           restaurant-level-three-c-family                 Family Restaurant
+1600 x 300   16 x 1           restaurant-level-three-d                        Buffet Restaurant
+1600 x 300   16 x 1           restaurant-level-three-e                        rest.three.e.cat
+1600 x 300   16 x 1           restaurant-level-three-f                        German Beer Hall
+2200 x 300   22 x 1           restaurant-roof-large                           Rooftop Restaurant
+1200 x 600   12 x 2           consultant-aesthetics-cp4                       Art Museum
+1200 x 600   12 x 2           consultant-building-cp4                         Union Hall
+1200 x 600   12 x 2           consultant-civics-cp4                           Press Room
+1200 x 600   12 x 2           consultant-tourism-cp4                          Tourist Bureau
+1200 x 600   12 x 2           retail-level-three-a                            Department Store
+1200 x 600   12 x 2           retail-level-three-b                            Furniture Store
+1200 x 600   12 x 2           retail-level-three-c                            Electronics Big Box Store
+1200 x 600   12 x 2           retail-level-three-d                            Upscale Grocery store
+1200 x 600   12 x 2           retail-level-three-e                            Fashion Boutique
+1200 x 600   12 x 2           retail-level-three-f                            Toy Store
+1200 x 600   12 x 2           retail-level-three-g                            Sporting Goods Store
+1400 x 600   14 x 2           casino-grand                                    Grand casino floor
+3200 x 600   32 x 2           retail-level-five-a                             Designer Clothing Store
+3200 x 600   32 x 2           retail-level-five-b                             Video Game Arcade

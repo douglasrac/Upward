@@ -1,0 +1,13 @@
+# Decompiled game code: copyrighted, never publish
+_decompiled/
+
+# Build output
+bin/
+obj/
+dist/
+*.user
+.vs/
+
+# Python
+__pycache__/
+*.pyc
