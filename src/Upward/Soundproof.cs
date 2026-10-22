@@ -1,42 +1,69 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Assets.Code.Music;
 using Game.Services;
 using Game.Services.Filesystem;
-using Game.UI.MouseOvers;
-using Game.UI.Session;
+using Game.Services.Input;
 using Game.Session;
 using Game.Session.Board;
+using Game.Session.Input;
 using Game.Session.Sim;
+using Game.UI.Session;
 using HarmonyLib;
 using UnityEngine;
-using UnityEngine.UI;
 using GameMain = Game.Game;
 
 namespace Upward
 {
-    // Laje antirruido: o jogador paga por andar e o mapa de ruido daquela laje fica sempre zerado
-    // (e, como a linha zerada tambem bloqueia o espalhamento, o ruido nao atravessa para os andares
-    // vizinhos). Cada andar e uma linha da grade do Heatmap; as lajes compradas ficam no save.
+    // Piso antirruido: o jogador paga por casa de piso, pintando com clique e arrasto como quando
+    // constroi andares, e o mapa de ruido dessas casas fica sempre zerado. Como a casa zerada tambem
+    // bloqueia o espalhamento, o ruido nao atravessa para os andares vizinhos naquele trecho.
+    // Assim da para tratar so uma das torres do mapa. As casas compradas ficam no save.
     internal static class Soundproof
     {
-        private const string SAVE_KEY = "upward_soundproof";
-        private const int FLOOR_HEIGHT = 150; // Grid.CELLSIZE.y
+        private const string SAVE_KEY_TILES = "upward_soundproof_tiles";
+        private const string SAVE_KEY_FLOORS = "upward_soundproof"; // versao antiga: andares inteiros
 
-        internal static readonly HashSet<int> Floors = new HashSet<int>();
+        internal static readonly HashSet<GridPos> Tiles = new HashSet<GridPos>();
+
+        // Andares inteiros vindos de save antigo: viram casas quando a grade ja existe
+        private static readonly List<int> _pendingFloors = new List<int>();
 
         // ---- Regra ----
 
-        // Zera a linha de cada laje tratada depois de cada atualizacao do mapa de ruido
+        // Zera as casas tratadas depois de cada atualizacao do mapa de ruido
         internal static void Apply(Heatmaps maps)
         {
-            if (Floors.Count == 0)
+            MigrateOldFloors();
+            if (Tiles.Count == 0)
             {
                 return;
             }
             var grid = GameMain.ctx.board.grid;
             float[] values = maps.GetHeatmap(HeatmapType.noiseHeatmap).data.values;
-            foreach (int floor in Floors)
+            foreach (GridPos pos in Tiles)
+            {
+                if (grid.IsGridPosValid(pos))
+                {
+                    values[grid.GridPosToGridIndex(pos)] = 0f;
+                }
+            }
+        }
+
+        internal static int CostPerTile
+        {
+            get { return Mathf.Max(1, Mathf.RoundToInt(Plugin.SoundproofCostPerCell.Value)); }
+        }
+
+        internal static void MigrateOldFloors()
+        {
+            if (_pendingFloors.Count == 0)
+            {
+                return;
+            }
+            var grid = GameMain.ctx.board.grid;
+            foreach (int floor in _pendingFloors)
             {
                 if (!grid.IsFloorValid(floor))
                 {
@@ -44,85 +71,221 @@ namespace Upward
                 }
                 for (int x = grid.mapleft; x < grid.mapright; x++)
                 {
-                    values[grid.GridPosToGridIndex(x, floor)] = 0f;
+                    var pos = new GridPos(x, floor);
+                    if (grid.FindGridCell(pos).hasFloor)
+                    {
+                        Tiles.Add(pos);
+                    }
                 }
             }
-        }
-
-        // Preco proporcional ao tamanho da laje (casas com piso construido no andar)
-        internal static int CellCount(int floor)
-        {
-            var grid = GameMain.ctx.board.grid;
-            if (!grid.IsFloorValid(floor))
-            {
-                return 0;
-            }
-            int n = 0;
-            for (int x = grid.mapleft; x < grid.mapright; x++)
-            {
-                if (grid.FindGridCell(new GridPos(x, floor)).hasFloor)
-                {
-                    n++;
-                }
-            }
-            return n;
-        }
-
-        internal static int Cost(int floor)
-        {
-            return Mathf.Max(1, Mathf.RoundToInt(CellCount(floor) * Plugin.SoundproofCostPerCell.Value));
-        }
-
-        internal static bool TryBuy(int floor)
-        {
-            if (Floors.Contains(floor) || CellCount(floor) == 0)
-            {
-                return false;
-            }
-            var player = GameMain.ctx.sim.player;
-            int cost = Cost(floor);
-            if (!player.CanSpend(-cost))
-            {
-                return false;
-            }
-            player.DoAdd(-cost, Reason.OtherOneTimeExpense);
-            Floors.Add(floor);
-            Plugin.Log.LogInfo("Laje antirruido comprada: andar " + floor + " por " + cost);
-            // Aplica ja, sem esperar o proximo ciclo do jogo
-            Apply(GameMain.ctx.board.heatmaps);
-            return true;
-        }
-
-        internal static void Remove(int floor)
-        {
-            Floors.Remove(floor);
+            Plugin.Log.LogInfo("Piso antirruido: " + _pendingFloors.Count + " andares do save antigo viraram "
+                + Tiles.Count + " casas");
+            _pendingFloors.Clear();
         }
 
         // ---- Save ----
 
         internal static void WriteTo(Hashtable data)
         {
+            MigrateOldFloors();
             var list = new ArrayList();
-            foreach (int f in Floors)
+            foreach (GridPos pos in Tiles)
             {
-                list.Add(f);
+                list.Add(pos.x);
+                list.Add(pos.y);
             }
-            data[SAVE_KEY] = list;
+            data[SAVE_KEY_TILES] = list;
         }
 
         internal static void ReadFrom(Hashtable data)
         {
-            Floors.Clear();
-            var list = data != null && data.ContainsKey(SAVE_KEY) ? data[SAVE_KEY] as IList : null;
-            if (list == null)
+            Tiles.Clear();
+            _pendingFloors.Clear();
+            if (data == null)
             {
                 return;
             }
-            foreach (object o in list)
+            var tiles = data.ContainsKey(SAVE_KEY_TILES) ? data[SAVE_KEY_TILES] as IList : null;
+            if (tiles != null)
             {
-                try { Floors.Add(Convert.ToInt32(o)); } catch (Exception) { }
+                for (int i = 0; i + 1 < tiles.Count; i += 2)
+                {
+                    try { Tiles.Add(new GridPos(Convert.ToInt32(tiles[i]), Convert.ToInt32(tiles[i + 1]))); }
+                    catch (Exception) { }
+                }
+                Plugin.Log.LogInfo("Piso antirruido: " + Tiles.Count + " casas carregadas do save");
+                return;
             }
-            Plugin.Log.LogInfo("Lajes antirruido carregadas do save: " + Floors.Count);
+            var floors = data.ContainsKey(SAVE_KEY_FLOORS) ? data[SAVE_KEY_FLOORS] as IList : null;
+            if (floors != null)
+            {
+                foreach (object o in floors)
+                {
+                    try { _pendingFloors.Add(Convert.ToInt32(o)); } catch (Exception) { }
+                }
+            }
+        }
+    }
+
+    // Modo de pintura igual ao de construir andar (mesmo cursor, mesma caixa de informacao com
+    // Cancelar, clique e arrasto casa a casa). Com Shift, o arrasto remove em vez de comprar.
+    internal class SoundproofInputMode : AddFloorInputMode
+    {
+        private int _dragTiles;
+        private int _dragSpent;
+
+        internal static bool Active
+        {
+            get { return GameMain.serv != null && GameMain.serv.input != null && GameMain.serv.input.Peek() is SoundproofInputMode; }
+        }
+
+        private static bool Removing
+        {
+            get { return Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift); }
+        }
+
+        internal static void Toggle()
+        {
+            if (GameMain.ctx == null || !GameMain.ctx.Initialized || GameMain.serv == null || GameMain.serv.input == null)
+            {
+                return;
+            }
+            if (Active)
+            {
+                DefaultInputMode.Start();
+            }
+            else
+            {
+                GameMain.serv.audio.PlayUISFX(UIEffectType.ButtonClick);
+                GameMain.serv.input.Replace(new SoundproofInputMode());
+            }
+        }
+
+        public override void OnHandlerActivated()
+        {
+            base.OnHandlerActivated();
+            Soundproof.MigrateOldFloors();
+            SoundproofButtonPatch.ShowOpen(true);
+        }
+
+        public override void OnHandlerDeactivated()
+        {
+            SoundproofButtonPatch.ShowOpen(false);
+            base.OnHandlerDeactivated();
+        }
+
+        // Sem substituicao especial: abrir o construir andar a partir daqui troca de modo normalmente
+        public override ReplacementType GetReplacement()
+        {
+            return ReplacementType.None;
+        }
+
+        public override void GetInfoText(out string title, out string body, out bool delete)
+        {
+            title = "Soundproof floor";
+            delete = Removing;
+            if (delete)
+            {
+                body = "Drag over soundproof tiles to remove them (no refund).\n";
+            }
+            else
+            {
+                body = "Drag over floor tiles to soundproof them.\nCost: " + Loc.Money(CostPerTileMoney) + " per tile\n"
+                    + "Hold Shift and drag to remove.\n";
+            }
+            if (_dragTiles > 0)
+            {
+                body += delete ? "Removed: " + _dragTiles + " tiles\n"
+                    : "This drag: " + _dragTiles + " tiles, " + Loc.Money(_dragSpent) + "\n";
+            }
+            body += "Soundproof tiles: " + Soundproof.Tiles.Count + "\n";
+        }
+
+        private static Money CostPerTileMoney
+        {
+            get { return Soundproof.CostPerTile; }
+        }
+
+        protected override void DoMouseDown(Vector2 pos)
+        {
+            base.DoMouseDown(pos);
+            _dragTiles = 0;
+            _dragSpent = 0;
+        }
+
+        private GridPos CursorTile
+        {
+            get { return _cursor.data.placement.gridpos; }
+        }
+
+        protected override bool CanPaint()
+        {
+            GridCell cell = _grid.FindGridCellOrNull(CursorTile);
+            if (cell == null || !cell.hasFloor)
+            {
+                return false;
+            }
+            bool owned = Soundproof.Tiles.Contains(CursorTile);
+            return Removing ? owned : !owned;
+        }
+
+        protected override bool CanPay()
+        {
+            return Removing || GameMain.ctx.sim.player.CanSpend(-Soundproof.CostPerTile);
+        }
+
+        protected override void PayAndPaint()
+        {
+            GridPos pos = CursorTile;
+            if (Removing)
+            {
+                Soundproof.Tiles.Remove(pos);
+            }
+            else
+            {
+                int cost = Soundproof.CostPerTile;
+                GameMain.ctx.sim.player.DoAdd(-cost, Reason.OtherOneTimeExpense, (GridPosF)pos);
+                Soundproof.Tiles.Add(pos);
+                _dragSpent += cost;
+                // Aplica ja, sem esperar o proximo ciclo do mapa de ruido
+                Soundproof.Apply(GameMain.ctx.board.heatmaps);
+            }
+            _dragTiles++;
+            PlayPaintSound(success: true);
+            _lastPlacementPos = pos;
+            _thisMovementSucceeded = true;
+        }
+
+        protected override void OnFailedPaint(bool dragging)
+        {
+            // Arrastando por cima de casas ja tratadas ou sem piso: silencioso, como no construir andar
+            if (dragging || _thisMovementSucceeded)
+            {
+                return;
+            }
+            GridPos pos = CursorTile;
+            if (_lastPlacementPos.HasValue && _lastPlacementPos.Value.Equals(pos))
+            {
+                return;
+            }
+            GridCell cell = _grid.FindGridCellOrNull(pos);
+            if (cell == null || !cell.hasFloor)
+            {
+                TryShowMouseover("No floor here");
+            }
+            else if (Removing)
+            {
+                TryShowMouseover("This tile is not soundproof");
+            }
+            else if (Soundproof.Tiles.Contains(pos))
+            {
+                TryShowMouseover("Already soundproof");
+            }
+            else
+            {
+                TryShowMouseover("Not enough money\n" + Loc.Money(CostPerTileMoney));
+            }
+            GameMain.serv.audio.PlayUISFX(UIEffectType.CantBuildHere);
         }
     }
 
@@ -153,7 +316,7 @@ namespace Upward
     [HarmonyPatch(typeof(SessionContext), nameof(SessionContext.StartInitializeManagers))]
     internal static class SoundproofLoadPatch
     {
-        // savefile e nulo em partida nova: comeca sem lajes tratadas
+        // savefile e nulo em partida nova: comeca sem casas tratadas
         private static void Prefix(SaveFile savefile)
         {
             Soundproof.ReadFrom(savefile != null ? savefile.data : null);
@@ -174,10 +337,10 @@ namespace Upward
                 return;
             }
             Button = HudButton.Create(__instance, "Soundproof Button", "textures/soundproof_icon.png", TOOLTIP_KEY,
-                SoundproofPanel.Toggle);
+                SoundproofInputMode.Toggle);
         }
 
-        // Painel aberto: fica com a borda acesa
+        // Modo ativo: fica com a borda acesa
         internal static void ShowOpen(bool open)
         {
             if (Button != null)
@@ -197,49 +360,24 @@ namespace Upward
             {
                 return true;
             }
-            __result = "Soundproof floor: pay per floor to keep that floor isolated from noise ("
+            __result = "Soundproof floor: click and drag to soundproof floor tiles, paying per tile ("
                 + Plugin.SoundproofKey.Value + ")";
             return false;
         }
     }
 
-    // Painel (tecla configuravel, padrao F8): escolhe o andar com as setas, mostra o preco e compra.
-    // Os andares tratados aparecem em azul sobre o predio; o escolhido, em amarelo.
+    // Tecla (padrao F8) e o destaque azul das casas ja tratadas enquanto o modo esta ativo.
+    // Framed tambem e usado pelos outros paineis do mod.
     internal class SoundproofPanel
     {
-        private static SoundproofPanel _instance;
-        private bool _open;
-        private bool _toggleRequested;
-        private int _floor;
-        private string _message = "";
-        private float _messageUntil;
-        private Texture2D _white;
-        private GUIStyle _label, _title, _box, _button;
-
-        public SoundproofPanel()
-        {
-            _instance = this;
-        }
-
-        // Chamado pelo botao da barra (UI do Unity); quem abre de fato e o OnGUI
-        internal static void Toggle()
-        {
-            if (_instance != null)
-            {
-                _instance._toggleRequested = true;
-            }
-        }
+        private static readonly Color TILE_COLOR = new Color(0.2f, 0.55f, 1f, 0.3f);
+        private readonly List<int> _row = new List<int>();
 
         public void OnGUI()
         {
             var ctx = GameMain.ctx;
-            if (ctx == null || !ctx.Initialized || ctx.board == null || GameMain.serv == null || GameMain.serv.camera == null)
-            {
-                _open = false;
-                _toggleRequested = false;
-                return;
-            }
-            if (!Plugin.SoundproofEnabled.Value)
+            if (ctx == null || !ctx.Initialized || ctx.board == null || GameMain.serv == null || GameMain.serv.camera == null
+                || !Plugin.SoundproofEnabled.Value)
             {
                 return;
             }
@@ -247,159 +385,65 @@ namespace Upward
             Event e = Event.current;
             if (e.type == EventType.KeyDown && e.keyCode == Plugin.SoundproofKey.Value)
             {
-                _toggleRequested = true;
+                SoundproofInputMode.Toggle();
                 e.Use();
             }
-            if (_toggleRequested)
+            if (e.type == EventType.Repaint && SoundproofInputMode.Active)
             {
-                _toggleRequested = false;
-                Toggle(ctx);
-            }
-            if (!_open)
-            {
-                return;
-            }
-
-            EnsureStyles();
-            DrawBands(ctx);
-            DrawWindow(ctx);
-        }
-
-        private void Toggle(SessionContext ctx)
-        {
-            _open = !_open;
-            SoundproofButtonPatch.ShowOpen(_open);
-            if (_open)
-            {
-                // Comeca no andar que esta no centro da tela
-                var center = new Vector2(Screen.width / 2f, Screen.height / 2f);
-                _floor = ctx.board.grid.WorldPosToGridPos(GameMain.serv.camera.ScreenToWorldPos(center)).y;
-                _floor = Mathf.Max(_floor, 0);
+                DrawTiles();
             }
         }
 
-        private void DrawBands(SessionContext ctx)
+        // Junta casas vizinhas do mesmo andar num retangulo so
+        private void DrawTiles()
         {
-            foreach (int f in Soundproof.Floors)
+            var byFloor = new Dictionary<int, List<int>>();
+            foreach (GridPos pos in Soundproof.Tiles)
             {
-                DrawBand(f, new Color(0.2f, 0.55f, 1f, 0.28f));
+                List<int> xs;
+                if (!byFloor.TryGetValue(pos.y, out xs))
+                {
+                    xs = new List<int>();
+                    byFloor[pos.y] = xs;
+                }
+                xs.Add(pos.x);
             }
-            DrawBand(_floor, new Color(1f, 0.85f, 0.2f, 0.28f));
-        }
-
-        private void DrawBand(int floor, Color color)
-        {
-            var cam = GameMain.serv.camera;
-            Vector2 bottom = cam.WorldToScreenPos(new WorldPos(0f, floor * FLOOR_H));
-            Vector2 top = cam.WorldToScreenPos(new WorldPos(0f, (floor + 1) * FLOOR_H));
-            // Coordenada de tela do Unity tem origem embaixo; a do IMGUI, em cima
-            float y1 = Screen.height - top.y;
-            float y2 = Screen.height - bottom.y;
             var old = GUI.color;
-            GUI.color = color;
-            GUI.DrawTexture(new Rect(0, y1, Screen.width, y2 - y1), _white);
+            GUI.color = TILE_COLOR;
+            foreach (KeyValuePair<int, List<int>> floor in byFloor)
+            {
+                List<int> xs = floor.Value;
+                xs.Sort();
+                int start = xs[0], prev = xs[0];
+                for (int i = 1; i <= xs.Count; i++)
+                {
+                    if (i < xs.Count && xs[i] == prev + 1)
+                    {
+                        prev = xs[i];
+                        continue;
+                    }
+                    DrawRun(floor.Key, start, prev);
+                    if (i < xs.Count)
+                    {
+                        start = prev = xs[i];
+                    }
+                }
+            }
             GUI.color = old;
         }
 
-        private const int FLOOR_H = 150;
-
-        private void DrawWindow(SessionContext ctx)
+        private static void DrawRun(int floor, int fromX, int toX)
         {
-            var rect = new Rect(WindowPosition(), new Vector2(270, 210));
-            GuiInputBlock.Add(rect);
-            GUI.Box(rect, GUIContent.none, _box);
-            GUILayout.BeginArea(new Rect(rect.x + 12, rect.y + 10, rect.width - 24, rect.height - 20));
-
-            GUILayout.Label("Soundproof floor", _title);
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Button("-", _button, GUILayout.Width(32))) { _floor--; }
-            GUILayout.Label("Floor " + _floor, _title, GUILayout.ExpandWidth(true));
-            if (GUILayout.Button("+", _button, GUILayout.Width(32))) { _floor++; }
-            GUILayout.EndHorizontal();
-
-            var grid = ctx.board.grid;
-            if (!grid.IsFloorValid(_floor))
+            var cam = GameMain.serv.camera;
+            Vector2 a = cam.WorldToScreenPos(new WorldPos(fromX * Grid.CELLSIZE.x, floor * Grid.CELLSIZE.y));
+            Vector2 b = cam.WorldToScreenPos(new WorldPos((toX + 1) * Grid.CELLSIZE.x, (floor + 1) * Grid.CELLSIZE.y));
+            // Coordenada de tela do Unity tem origem embaixo; a do IMGUI, em cima
+            var rect = Rect.MinMaxRect(a.x, Screen.height - b.y, b.x, Screen.height - a.y);
+            if (rect.xMax < 0 || rect.xMin > Screen.width || rect.yMax < 0 || rect.yMin > Screen.height)
             {
-                _floor = Mathf.Clamp(_floor, grid.mapbottom, grid.maptop - 1);
+                return;
             }
-
-            int cells = Soundproof.CellCount(_floor);
-            bool owned = Soundproof.Floors.Contains(_floor);
-            if (owned)
-            {
-                GUILayout.Label("This floor is already soundproof.", _label);
-                if (GUILayout.Button("Remove (no refund)", _button))
-                {
-                    Soundproof.Remove(_floor);
-                }
-            }
-            else if (cells == 0)
-            {
-                GUILayout.Label("No floor tiles built on this floor.", _label);
-            }
-            else
-            {
-                int cost = Soundproof.Cost(_floor);
-                GUILayout.Label("Price: $" + cost + "  (" + cells + " tiles)", _label);
-                bool can = ctx.sim.player.CanSpend(-cost);
-                GUI.enabled = can;
-                if (GUILayout.Button(can ? "Soundproof this floor" : "Not enough money", _button))
-                {
-                    if (Soundproof.TryBuy(_floor))
-                    {
-                        Say("Floor " + _floor + " is now soundproof.");
-                    }
-                }
-                GUI.enabled = true;
-            }
-
-            GUILayout.Label("Soundproof floors: " + Soundproof.Floors.Count, _label);
-            if (Time.unscaledTime < _messageUntil)
-            {
-                GUILayout.Label(_message, _label);
-            }
-            if (GUILayout.Button("Close", _button))
-            {
-                _open = false;
-                SoundproofButtonPatch.ShowOpen(false);
-            }
-            GUILayout.EndArea();
-        }
-
-        // Logo abaixo do botao da barra
-        private static Vector2 WindowPosition()
-        {
-            var button = SoundproofButtonPatch.Button;
-            return button == null || button.Rect == null ? new Vector2(170, 54) : button.BelowLeft();
-        }
-
-        private void Say(string text)
-        {
-            _message = text;
-            _messageUntil = Time.unscaledTime + 3f;
-        }
-
-        private void EnsureStyles()
-        {
-            if (_white == null)
-            {
-                _white = Texture2D.whiteTexture;
-            }
-            if (_label == null)
-            {
-                // Cores das caixas do jogo: fundo cinza-chumbo opaco, borda um pouco mais clara
-                var text = new Color(0.93f, 0.93f, 0.95f);
-                _label = new GUIStyle(GUI.skin.label) { wordWrap = true, fontSize = 13 };
-                _label.normal.textColor = text;
-                _title = new GUIStyle(_label) { fontStyle = FontStyle.Bold, fontSize = 15 };
-                _box = new GUIStyle(GUI.skin.box) { border = new RectOffset(2, 2, 2, 2) };
-                _box.normal.background = Framed(new Color32(30, 31, 36, 255), new Color32(78, 80, 90, 255));
-                _button = new GUIStyle(GUI.skin.button) { fontSize = 13, border = new RectOffset(2, 2, 2, 2) };
-                _button.normal.background = Framed(new Color32(52, 54, 62, 255), new Color32(90, 93, 104, 255));
-                _button.hover.background = Framed(new Color32(70, 73, 84, 255), new Color32(220, 220, 225, 255));
-                _button.active.background = Framed(new Color32(40, 41, 47, 255), new Color32(220, 220, 225, 255));
-                _button.normal.textColor = _button.hover.textColor = _button.active.textColor = text;
-            }
+            GUI.DrawTexture(rect, Texture2D.whiteTexture);
         }
 
         // Textura 8x8 com 2px de borda, esticada pelo GUIStyle.border

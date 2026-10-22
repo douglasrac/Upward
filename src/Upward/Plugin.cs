@@ -106,11 +106,11 @@ namespace Upward
                 + "HVAC nao muda.");
 
             SoundproofEnabled = Config.Bind("Ruido", "LajeAntirruido", true,
-                "Liga o painel de laje antirruido: paga-se por andar e o ruido daquela laje some.");
+                "Liga o piso antirruido: clica e arrasta sobre o piso (como construir andar), paga-se por casa e o ruido dessas casas some.");
             SoundproofCostPerCell = Config.Bind("Ruido", "PrecoPorCasa", 200f,
-                "Preco da laje antirruido por casa de piso construida no andar.");
+                "Preco do piso antirruido por casa tratada.");
             SoundproofKey = Config.Bind("Ruido", "Tecla", KeyCode.F8,
-                "Tecla que abre e fecha o painel de laje antirruido.");
+                "Tecla que liga e desliga o modo de piso antirruido.");
 
             DragBuildEnabled = Config.Bind("Construcao", "ArrastarSalas", true,
                 "Clicar e arrastar com uma sala selecionada (quarto, escritorio, loja, apartamento...) constroi "
