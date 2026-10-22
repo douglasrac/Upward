@@ -160,14 +160,12 @@ namespace Upward
         }
     }
 
-    // Botao de verdade na barra do canto superior esquerdo: clona o "Grid Button" do jogo, entao tem
-    // a mesma borda ao passar o mouse e a mesma caixa de descricao (TextMouseover com lockey proprio).
+    // Botao na barra do canto superior esquerdo (clone do Grid Button, veja HudButton)
     [HarmonyPatch(typeof(HUDLayers), "InitializeGameObject")]
     internal static class SoundproofButtonPatch
     {
         internal const string TOOLTIP_KEY = "upward.soundproof.tooltip";
-        internal static RectTransform ButtonRect;
-        private static Sprite _iconSprite;
+        internal static HudButton Button;
 
         private static void Postfix(HUDLayers __instance)
         {
@@ -175,123 +173,18 @@ namespace Upward
             {
                 return;
             }
-            var go = Traverse.Create(__instance).Field("_go").GetValue<GameObject>();
-            Transform grid = go != null ? go.transform.Find("Panel Buttons/Grid Button") : null;
-            if (grid == null)
-            {
-                Plugin.Log.LogWarning("Laje antirruido: botao Grid Button nao encontrado; sem botao na barra");
-                return;
-            }
-
-            GameObject clone = UnityEngine.Object.Instantiate(grid.gameObject, grid.parent, false);
-            clone.name = "Upward Soundproof Button";
-            clone.transform.SetSiblingIndex(grid.GetSiblingIndex() + 1);
-            ButtonRect = clone.GetComponent<RectTransform>();
-
-            // Sem layout automatico na barra: coloca ao lado do Grid, com o mesmo espacamento entre botoes,
-            // e alarga o fundo escuro da barra para cobrir o botao novo
-            if (grid.parent.GetComponent<LayoutGroup>() == null)
-            {
-                var gridRect = grid.GetComponent<RectTransform>();
-                float step = gridRect.rect.width;
-                int idx = grid.GetSiblingIndex();
-                if (idx > 0)
-                {
-                    var prev = grid.parent.GetChild(idx - 1).GetComponent<RectTransform>();
-                    if (prev != null && prev.gameObject.activeSelf)
-                    {
-                        step = gridRect.anchoredPosition.x - prev.anchoredPosition.x;
-                    }
-                }
-                ButtonRect.anchoredPosition = gridRect.anchoredPosition + new Vector2(step, 0f);
-                WidenBar(grid.parent, step);
-            }
-
-            var button = clone.GetComponent<Button>();
-            button.onClick = new Button.ButtonClickedEvent();
-            button.onClick.AddListener(SoundproofPanel.Toggle);
-
-            foreach (var tip in clone.GetComponentsInChildren<TextMouseOverContext>(true))
-            {
-                tip.lockey = TOOLTIP_KEY;
-            }
-
-            // A Image do botao e so a moldura (o jogo troca pela com borda ao passar o mouse); o icone do
-            // grid e um glyph no texto filho. Esconde o texto e poe o nosso icone numa Image filha.
-            foreach (Transform child in clone.transform)
-            {
-                child.gameObject.SetActive(false);
-            }
-            if (_iconSprite == null)
-            {
-                _iconSprite = LoadSprite("textures/soundproof_icon.png");
-            }
-            if (_iconSprite != null)
-            {
-                var iconGo = new GameObject("Upward Icon", typeof(RectTransform));
-                iconGo.transform.SetParent(clone.transform, false);
-                var rt = iconGo.GetComponent<RectTransform>();
-                rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
-                float size = Mathf.Min(ButtonRect.rect.width, ButtonRect.rect.height) * 0.55f;
-                rt.sizeDelta = new Vector2(size, size);
-                var img = iconGo.AddComponent<Image>();
-                img.sprite = _iconSprite;
-                img.preserveAspect = true;
-                img.raycastTarget = false;
-            }
-
-            _frame = clone.GetComponent<Image>();
-            _frameNormal = _frame != null ? _frame.sprite : null;
-            _frameLit = button.spriteState.highlightedSprite;
+            Button = HudButton.Create(__instance, "Soundproof Button", "textures/soundproof_icon.png", TOOLTIP_KEY,
+                SoundproofPanel.Toggle);
         }
 
-        private static Image _frame;
-        private static Sprite _frameNormal, _frameLit;
-
-        // Painel aberto: fica com a borda acesa, como os botoes do jogo quando selecionados
+        // Painel aberto: fica com a borda acesa
         internal static void ShowOpen(bool open)
         {
-            if (_frame != null && _frameLit != null)
+            if (Button != null)
             {
-                _frame.sprite = open ? _frameLit : _frameNormal;
+                Button.ShowLit(open);
             }
         }
-
-        // O fundo da barra pode ser a propria "Panel Buttons" ou o pai dela: alarga a primeira com Image,
-        // mantendo a borda esquerda no lugar
-        private static void WidenBar(Transform bar, float extra)
-        {
-            for (Transform t = bar; t != null && t != bar.parent.parent; t = t.parent)
-            {
-                var img = t.GetComponent<Image>();
-                var rt = t as RectTransform;
-                if (img == null || rt == null || rt.anchorMin.x != rt.anchorMax.x)
-                {
-                    continue;
-                }
-                rt.sizeDelta += new Vector2(extra, 0f);
-                rt.anchoredPosition += new Vector2(extra * rt.pivot.x, 0f);
-                // Um filho ancorado em a (0 = esquerda, 1 = direita) andaria extra * a: devolve
-                foreach (Transform child in t)
-                {
-                    var c = child as RectTransform;
-                    if (c != null && c.anchorMin.x == c.anchorMax.x)
-                    {
-                        c.anchoredPosition -= new Vector2(extra * c.anchorMin.x, 0f);
-                    }
-                }
-                Plugin.Log.LogInfo("Laje antirruido: fundo da barra '" + t.name + "' alargado em " + extra);
-                return;
-            }
-            Plugin.Log.LogInfo("Laje antirruido: fundo da barra nao encontrado; botao fica ao lado");
-        }
-
-        private static Sprite LoadSprite(string relative)
-        {
-            Texture2D tex = UpwardAssets.LoadTexture(relative, TextureWrapMode.Clamp);
-            return tex == null ? null : Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
-        }
-
     }
 
     // Texto da caixa de descricao do botao (o jogo busca pelo lockey)
@@ -473,17 +366,11 @@ namespace Upward
             GUILayout.EndArea();
         }
 
-        // Logo abaixo do botao da barra (canvas em Screen Space Overlay: cantos ja em pixels de tela)
+        // Logo abaixo do botao da barra
         private static Vector2 WindowPosition()
         {
-            var rt = SoundproofButtonPatch.ButtonRect;
-            if (rt == null)
-            {
-                return new Vector2(170, 54);
-            }
-            var corners = new Vector3[4];
-            rt.GetWorldCorners(corners); // 0 = baixo-esquerda
-            return new Vector2(corners[0].x, Screen.height - corners[0].y + 6f);
+            var button = SoundproofButtonPatch.Button;
+            return button == null || button.Rect == null ? new Vector2(170, 54) : button.BelowLeft();
         }
 
         private void Say(string text)

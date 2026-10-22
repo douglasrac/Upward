@@ -13,7 +13,7 @@ namespace Upward
     public class Plugin : BaseUnityPlugin
     {
         public const string Guid = "upward.projecthighrise";
-        public const string Version = "1.1.0";
+        public const string Version = "1.2.0";
 
         internal static Plugin Instance;
         internal static ManualLogSource Log;
@@ -44,6 +44,8 @@ namespace Upward
 
         internal static ConfigEntry<bool> DragBuildEnabled;
         internal static ConfigEntry<bool> FurnishAllEnabled;
+        internal static ConfigEntry<bool> PipetteEnabled;
+        internal static ConfigEntry<KeyCode> PipetteKey;
 
         internal static ConfigEntry<bool> AutoBookingEnabled;
         internal static ConfigEntry<KeyCode> AutoBookingKey;
@@ -116,6 +118,11 @@ namespace Upward
             FurnishAllEnabled = Config.Bind("Construcao", "MobiliarTodos", true,
                 "No Pick furnishings de quartos de hotel e apartamentos, Shift+clique numa opcao "
                 + "aplica a escolha a todos os espacos vagos do mesmo tipo no predio.");
+            PipetteEnabled = Config.Bind("Construcao", "ContaGotas", true,
+                "Botao na barra (e tecla) que copia algo ja construido: entra direto no modo de construir o mesmo "
+                + "item, sem procurar no menu. Salas ocupadas viram o espaco vazio do mesmo tipo e tamanho.");
+            PipetteKey = Config.Bind("Construcao", "TeclaContaGotas", KeyCode.V,
+                "Tecla do conta-gotas: mesma funcao do botao (arma a ferramenta; o proximo clique escolhe).");
 
             AutoBookingEnabled = Config.Bind("Eventos", "BookingAutomatico", true,
                 "Salas de evento marcadas no painel reservam sozinhas o artista/evento corporativo disponivel "
@@ -162,6 +169,17 @@ namespace Upward
                     Log.LogError("Erro no painel de booking automatico: " + ex);
                 }
             }
+            try
+            {
+                Pipette.OnGUI();
+            }
+            catch (Exception ex)
+            {
+                if (_loggedErrors.Add("gui" + ex.GetType().Name + ex.StackTrace))
+                {
+                    Log.LogError("Erro no conta-gotas: " + ex);
+                }
+            }
         }
 
         private void Update()
@@ -171,6 +189,7 @@ namespace Upward
                 _heatmapTweaks.Update();
                 _utilityCapacity.Update();
                 _storeHours.Update();
+                Pipette.Update();
             }
             catch (Exception ex)
             {
