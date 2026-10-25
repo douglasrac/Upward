@@ -2,7 +2,7 @@
 
 **The ultimate mod for Project Highrise.** Upward is a [BepInEx 5](https://github.com/BepInEx/BepInEx) plugin that makes your tower feel alive at night and removes a lot of the tedious clicking from building — without replacing the original game.
 
-> Version 1.2.0 · Project Highrise (Steam, Windows) · BepInEx 5.4.23 **x86**
+> Version 1.3.0 · Project Highrise (Steam, Windows) · BepInEx 5.4.23 **x86**
 
 ---
 
@@ -21,11 +21,12 @@
 - **Drag to build rooms.** With a room selected (hotel room, office, shop, apartment...), click and drag to build several side by side on the floor where the drag started. A single click works as before.
 - **Furnish all at once.** In the *Pick furnishings* dialog for hotel rooms and apartments, **Shift+click** an option to furnish every other vacant space of the same type and size in the building (each one is charged, until you run out of money).
 - **Pipette.** A new button on the top-left HUD bar (or press **V**) arms the pipette: click anything already built and you go straight into building that same item, without hunting for it in the build menu. Occupied rooms (offices, shops, apartments, furnished hotel rooms) pick the empty space of the same type and size; services such as the Communal Bathroom, vending machines and mod items work too. Esc or V again cancels.
+- **Shops underground.** Ice Cream Stand, Smoothie Bar, the art rooms (Art Consultant, Art Dealer, Art Gallery, Art Museum) and indoor artwork (paintings, sculptures, murals, indoor fountains) can also be built below ground.
 - **Automatic utility lines.** A finished electrical or plumbing closet automatically lays its lines (power, phone, cable TV / water, gas, HVAC) across the whole floor, for free — you only pay for the closet. New floor built later on a floor with a closet also gets the lines. Old saves are completed when loaded.
 - **Bigger utility meters.** Power, water, cable, gas and phone hookups supply 25 / 100 / 300 instead of 10 / 50 / 150. HVAC is unchanged.
 
 ### Noise, smell and services
-- **Soundproof floors.** A new button on the top-left HUD bar (next to the Grid button, or press **F8**) opens a panel where you can soundproof a floor. You pay per floor (200 per built floor tile by default); that floor's noise is cleared and no longer spreads to the floors above and below. Soundproofed floors are stored in your save.
+- **Soundproof floors.** A new button on the top-left HUD bar (next to the Grid button, or press **F8**) turns on soundproofing mode: click and drag over built floor to paint it tile by tile, just like building floor. You pay per tile (200 by default); painted tiles have their noise cleared and it no longer spreads to the floors above and below there, so you can treat just one tower of a map. Hold **Shift** and drag to remove. Painted tiles are stored in your save (old saves with whole soundproofed floors are converted to tiles).
 - **Auto booking for events.** In *Performer Booking*, the new **Auto booking** button (or press **F9**) lists every event space. Check the ones you want on autopilot and set each one's ticket price: whenever a checked space is free (cleaned and with nothing booked), it books the cheapest available performer or corporate event, just like doing it by hand. It only books when a performer suite is free for that day, so events are not cancelled for lack of a room. Choices are stored in your save.
 - **Restaurant smell stays on its floor.** Smell spreads sideways only, never up or down.
 - **Fewer service requests.** Apartments and offices ask for services (plumber, florist, IT, water...) 40% less often. Hotel rooms are not affected.
@@ -39,7 +40,7 @@ Every feature can be switched off or tuned in the config file (see [Configuratio
 
 The download already includes **BepInEx 5.4.23.2 (x86)**, the mod loader Upward runs on. You just extract one zip into the game folder.
 
-1. Download **`Upward-1.2.0.zip`** from the [Releases page](https://github.com/douglasrac/Upward/releases).
+1. Download **`Upward-1.3.0.zip`** from the [Releases page](https://github.com/douglasrac/Upward/releases).
 2. Find your game folder: in Steam, right-click **Project Highrise → Manage → Browse local files**. It looks like
    `...\steamapps\common\Project Highrise\` and contains `Game.exe`.
 3. Extract the zip **into that folder** (allow it to merge folders). You should end up with:
@@ -56,15 +57,15 @@ The download already includes **BepInEx 5.4.23.2 (x86)**, the mod loader Upward 
             ├─ sounds\
             └─ textures\
    ```
-4. Start the game from Steam as usual. To check that it loaded, open `BepInEx\LogOutput.log` and look for a line like `Upward 1.2.0 carregado`.
+4. Start the game from Steam as usual. To check that it loaded, open `BepInEx\LogOutput.log` and look for a line like `Upward 1.3.0 carregado`.
 
 ### Already have BepInEx?
-If you already use BepInEx 5 **x86** for other Project Highrise mods, download **`Upward-1.2.0-plugin-only.zip`** instead and extract it into `Project Highrise\BepInEx\plugins\`. Don't use the x64 build of BepInEx: Project Highrise is a 32-bit game, so it will not load.
+If you already use BepInEx 5 **x86** for other Project Highrise mods, download **`Upward-1.3.0-plugin-only.zip`** instead and extract it into `Project Highrise\BepInEx\plugins\`. Don't use the x64 build of BepInEx: Project Highrise is a 32-bit game, so it will not load.
 
 ### Uninstall
 Delete the `BepInEx\plugins\Upward` folder (and optionally `BepInEx\config\upward.projecthighrise.cfg`). To remove BepInEx entirely, also delete `winhttp.dll`, `doorstop_config.ini` and the `BepInEx` folder.
 
-> **Saves:** Upward only adds its own data (soundproofed floors) to the save. Utility lines it laid and furniture it bought are normal game objects and stay if you remove the mod.
+> **Saves:** Upward only adds its own data (soundproofed tiles, auto booking choices) to the save. Utility lines it laid and furniture it bought are normal game objects and stay if you remove the mod.
 
 ---
 
@@ -91,13 +92,14 @@ After the first launch with Upward, edit `BepInEx\config\upward.projecthighrise.
 | `Utilidades` | `LinhasAutomaticas` | `true` | Closets lay their lines across the floor for free |
 | `Utilidades` | `CompletarSavesAntigos` | `true` | Complete utility lines on floors with closets when loading a save |
 | `Utilidades` | `LigacoesMaiores` | `true` | Bigger utility meter capacities |
-| `Ruido` | `LajeAntirruido` | `true` | Enable the soundproof floor panel |
+| `Ruido` | `LajeAntirruido` | `true` | Enable soundproof floor painting |
 | `Ruido` | `PrecoPorCasa` | `200` | Soundproofing price per built floor tile |
-| `Ruido` | `Tecla` | `F8` | Key that opens/closes the soundproof panel |
+| `Ruido` | `Tecla` | `F8` | Key that turns soundproofing mode on/off |
 | `Construcao` | `ArrastarSalas` | `true` | Drag to build rooms |
 | `Construcao` | `MobiliarTodos` | `true` | Shift+click to furnish all vacant spaces |
 | `Construcao` | `ContaGotas` | `true` | Pipette button |
 | `Construcao` | `TeclaContaGotas` | `V` | Key that arms the pipette |
+| `Construcao` | `LojasNoSubsolo` | `true` | Ice cream, smoothie, art rooms and indoor art can be built underground |
 | `Eventos` | `BookingAutomatico` | `true` | Auto booking panel for event spaces |
 | `Eventos` | `Tecla` | `F9` | Key that opens/closes the auto booking panel |
 | `Servicos` | `FrequenciaPedidos` | `0.6` | Service request frequency multiplier (1 = original game) |

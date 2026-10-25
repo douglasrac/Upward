@@ -13,7 +13,7 @@ namespace Upward
     public class Plugin : BaseUnityPlugin
     {
         public const string Guid = "upward.projecthighrise";
-        public const string Version = "1.2.0";
+        public const string Version = "1.3.0";
 
         internal static Plugin Instance;
         internal static ManualLogSource Log;
