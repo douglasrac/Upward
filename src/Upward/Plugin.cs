@@ -46,6 +46,7 @@ namespace Upward
         internal static ConfigEntry<bool> FurnishAllEnabled;
         internal static ConfigEntry<bool> PipetteEnabled;
         internal static ConfigEntry<KeyCode> PipetteKey;
+        internal static ConfigEntry<bool> ShopsUnderground;
 
         internal static ConfigEntry<bool> AutoBookingEnabled;
         internal static ConfigEntry<KeyCode> AutoBookingKey;
@@ -58,6 +59,7 @@ namespace Upward
         private StoreHours _storeHours;
         private readonly HeatmapTweaks _heatmapTweaks = new HeatmapTweaks();
         private readonly UtilityCapacity _utilityCapacity = new UtilityCapacity();
+        private readonly UndergroundShops _undergroundShops = new UndergroundShops();
         private readonly HashSet<string> _loggedErrors = new HashSet<string>();
 
         private void Awake()
@@ -123,6 +125,9 @@ namespace Upward
                 + "item, sem procurar no menu. Salas ocupadas viram o espaco vazio do mesmo tipo e tamanho.");
             PipetteKey = Config.Bind("Construcao", "TeclaContaGotas", KeyCode.V,
                 "Tecla do conta-gotas: mesma funcao do botao (arma a ferramenta; o proximo clique escolhe).");
+            ShopsUnderground = Config.Bind("Construcao", "LojasNoSubsolo", true,
+                "Ice Cream Stand, Smoothie Bar, as salas de arte (Art Consultant, Dealer, Gallery, Museum) e as "
+                + "obras de arte internas (quadros, esculturas, murais, fontes) tambem podem ficar no subsolo.");
 
             AutoBookingEnabled = Config.Bind("Eventos", "BookingAutomatico", true,
                 "Salas de evento marcadas no painel reservam sozinhas o artista/evento corporativo disponivel "
@@ -188,6 +193,7 @@ namespace Upward
             {
                 _heatmapTweaks.Update();
                 _utilityCapacity.Update();
+                _undergroundShops.Update();
                 _storeHours.Update();
                 Pipette.Update();
             }
