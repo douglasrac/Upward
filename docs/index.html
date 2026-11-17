@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Upward · Project Highrise mod</title>
+<meta name="description" content="Upward is a BepInEx mod for Project Highrise: shops close at night, lights follow residents, and building takes far fewer clicks.">
+<meta property="og:title" content="Upward · the ultimate mod for Project Highrise">
+<meta property="og:description" content="Shops close at night, lights follow residents, and building takes far fewer clicks.">
+<meta property="og:image" content="https://douglasrac.github.io/Upward/video/night.jpg">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='8' y='4' width='16' height='26' rx='1' fill='%23131a2e'/%3E%3Crect x='11' y='8' width='4' height='4' fill='%23ffb547'/%3E%3Crect x='17' y='14' width='4' height='4' fill='%23ffb547'/%3E%3Crect x='11' y='20' width='4' height='4' fill='%23ffb547'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b1020; --bg2:#10172b; --panel:#141c33; --line:#232d4a;
+  --ink:#e8ecf6; --muted:#9aa5c0; --dim:#6b7694;
+  --amber:#ffb547; --amber-soft:#ffcf85; --glow:rgba(255,181,71,.35);
+  --blue:#7aa2ff; --night:#1a2442;
+  --radius:14px;
+  --display:"Bricolage Grotesque",system-ui,sans-serif;
+  --body:"Inter",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 var(--body);-webkit-font-smoothing:antialiased}
+a{color:var(--amber-soft);text-underline-offset:3px}
+a:hover{color:var(--amber)}
+img{max-width:100%;display:block}
+code,kbd{font-family:var(--mono);font-size:.88em}
+code{background:#1b2440;border:1px solid var(--line);padding:.08em .4em;border-radius:6px;color:#cfd8ef}
+kbd{background:#222c4b;border:1px solid #34406a;border-bottom-width:3px;padding:.05em .45em;border-radius:6px;color:var(--ink)}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+@media (max-width:600px){.wrap{padding:0 16px}}
+
+/* nav */
+nav{position:sticky;top:0;z-index:20;background:rgba(11,16,32,.82);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;align-items:center;gap:24px;height:60px}
+.brand{font:800 20px/1 var(--display);letter-spacing:-.02em;color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:10px}
+.brand svg{width:22px;height:22px}
+nav ul{list-style:none;margin:0 0 0 auto;padding:0;display:flex;gap:22px}
+nav ul a{color:var(--muted);text-decoration:none;font-size:14px;font-weight:500}
+nav ul a:hover{color:var(--ink)}
+@media (max-width:760px){nav ul{display:none}}
+
+/* hero */
+.hero{position:relative;overflow:hidden;padding:72px 0 40px;background:
+  radial-gradient(900px 420px at 80% 10%,rgba(122,162,255,.12),transparent 60%),
+  radial-gradient(600px 300px at 10% 90%,rgba(255,181,71,.07),transparent 60%)}
+.hero .wrap{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center}
+@media (max-width:900px){.hero .wrap{grid-template-columns:1fr}}
+.eyebrow{display:inline-flex;gap:8px;align-items:center;font:500 13px/1 var(--mono);color:var(--amber-soft);background:rgba(255,181,71,.08);border:1px solid rgba(255,181,71,.25);padding:7px 11px;border-radius:999px}
+h1{font:800 clamp(42px,6vw,72px)/1 var(--display);letter-spacing:-.035em;margin:20px 0 18px}
+h1 em{font-style:normal;color:var(--amber);text-shadow:0 0 40px var(--glow)}
+.lede{font-size:18px;color:var(--muted);max-width:34em;margin:0 0 28px}
+.cta{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:10px;font:600 15px/1 var(--body);padding:14px 20px;border-radius:12px;text-decoration:none;transition:transform .15s,box-shadow .15s,background .15s}
+.btn-primary{background:var(--amber);color:#1b1305;box-shadow:0 8px 30px -8px var(--glow)}
+.btn-primary:hover{color:#1b1305;transform:translateY(-1px);box-shadow:0 12px 36px -8px var(--glow)}
+.btn-ghost{color:var(--ink);border:1px solid var(--line);background:var(--bg2)}
+.btn-ghost:hover{color:var(--ink);border-color:#3a4670}
+.meta{margin-top:18px;font-size:13px;color:var(--dim)}
+
+/* video clips */
+.clip{margin:0}
+.clip video{display:block;width:100%;height:auto;aspect-ratio:16/9;background:#060912;border:1px solid var(--line);border-radius:16px;box-shadow:0 30px 80px -30px rgba(0,0,0,.75)}
+.clip figcaption{font-size:13px;color:var(--dim);margin-top:10px}
+.hero-clip video{box-shadow:0 30px 90px -25px rgba(255,181,71,.18),0 30px 80px -30px rgba(0,0,0,.8)}
+.feature-clip{margin:0 0 18px;max-width:880px}
+
+/* sections */
+section{padding:88px 0;border-top:1px solid var(--line)}
+.kicker{font:500 13px/1 var(--mono);color:var(--amber-soft);text-transform:uppercase;letter-spacing:.08em}
+h2{font:800 clamp(30px,4vw,44px)/1.08 var(--display);letter-spacing:-.025em;margin:12px 0 14px}
+.sub{color:var(--muted);max-width:40em;margin:0 0 40px;font-size:17px}
+h3{font:700 19px/1.25 var(--display);margin:0 0 8px;letter-spacing:-.01em}
+
+.groups{display:grid;gap:56px}
+.group-head{display:flex;align-items:baseline;gap:14px;margin-bottom:18px}
+.group-head h3{font-size:24px;margin:0}
+.group-head span{color:var(--dim);font-size:14px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+@media (max-width:600px){.cards{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px 20px 18px;transition:border-color .2s,transform .2s}
+.card:hover{border-color:#34406a;transform:translateY(-2px)}
+.card p{margin:0;color:var(--muted);font-size:15px}
+.card .ico{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;margin-bottom:14px;background:rgba(255,181,71,.1);color:var(--amber)}
+.card .ico svg{width:19px;height:19px}
+.card .new{font:600 10px/1 var(--mono);color:#1b1305;background:var(--amber);border-radius:4px;padding:3px 5px;margin-left:6px;vertical-align:3px;letter-spacing:.04em}
+
+/* gallery */
+.street{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 24px 18px;margin:0 -24px;scrollbar-color:#2b365a transparent}
+@media (max-width:600px){.street{padding:4px 16px 18px;margin:0 -16px}}
+.street figure{margin:0;flex:none;scroll-snap-align:start}
+.street img{height:220px;width:auto;border-radius:10px;border:1px solid var(--line)}
+@media (max-width:600px){.street img{height:150px}}
+.street figcaption{font-size:13px;color:var(--dim);margin-top:8px}
+.gallery-note{color:var(--dim);font-size:14px;margin-top:6px}
+
+/* install */
+.install{display:grid;grid-template-columns:1.1fr .9fr;gap:40px}
+@media (max-width:900px){.install{grid-template-columns:1fr}}
+ol.steps{list-style:none;counter-reset:s;margin:0;padding:0;display:grid;gap:18px}
+ol.steps li{counter-increment:s;position:relative;padding-left:48px}
+ol.steps li::before{content:counter(s);position:absolute;left:0;top:-2px;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font:700 15px var(--display);background:var(--panel);border:1px solid var(--line);color:var(--amber)}
+ol.steps strong{color:var(--ink)}
+ol.steps p{margin:4px 0 0;color:var(--muted)}
+pre{margin:0;background:#0a0f1e;border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;overflow-x:auto;font:13.5px/1.7 var(--mono);color:#c9d3ea}
+pre .c{color:var(--dim)}
+pre .h{color:var(--amber-soft)}
+.note{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--blue);border-radius:10px;padding:14px 16px;font-size:15px;color:var(--muted);margin-top:18px}
+.note strong{color:var(--ink)}
+
+/* config */
+details{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);margin-top:14px}
+summary{cursor:pointer;padding:16px 20px;font-weight:600;list-style:none;display:flex;justify-content:space-between;align-items:center}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font:400 22px/1 var(--body);color:var(--muted)}
+details[open] summary::after{content:"–"}
+.table-wrap{overflow-x:auto;border-top:1px solid var(--line)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:10px 20px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--dim);font-weight:500;font-size:12px;text-transform:uppercase;letter-spacing:.06em;background:var(--bg2)}
+td:nth-child(3){font-family:var(--mono);font-size:13px;color:var(--amber-soft);white-space:nowrap}
+td:last-child{color:var(--muted)}
+tr:last-child td{border-bottom:0}
+
+/* changelog */
+.log{display:grid;gap:0;border-left:2px solid var(--line);margin-left:6px}
+.rel{position:relative;padding:0 0 30px 28px}
+.rel::before{content:"";position:absolute;left:-7px;top:6px;width:12px;height:12px;border-radius:50%;background:var(--bg);border:2px solid var(--dim)}
+.rel:first-child::before{border-color:var(--amber);background:var(--amber);box-shadow:0 0 14px var(--glow)}
+.rel h3{display:flex;gap:12px;align-items:baseline}
+.rel h3 small{font:400 13px var(--mono);color:var(--dim)}
+.rel ul{margin:6px 0 0;padding-left:18px;color:var(--muted)}
+.rel li{margin:3px 0}
+
+footer{border-top:1px solid var(--line);padding:40px 0 56px;color:var(--dim);font-size:14px}
+footer .wrap{display:grid;gap:10px}
+footer p{margin:0}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a class="brand" href="#top">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><rect x="8" y="3" width="16" height="27" rx="1.5" fill="#1d2747" stroke="#3a4670"/><rect x="11" y="7" width="4" height="4" fill="#ffb547"/><rect x="17" y="13" width="4" height="4" fill="#ffb547"/><rect x="11" y="19" width="4" height="4" fill="#ffb547"/><rect x="17" y="7" width="4" height="4" fill="#2a3456"/><rect x="11" y="13" width="4" height="4" fill="#2a3456"/><rect x="17" y="19" width="4" height="4" fill="#2a3456"/></svg>
+      Upward
+    </a>
+    <ul>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#storefronts">Storefronts</a></li>
+      <li><a href="#install">Install</a></li>
+      <li><a href="#config">Config</a></li>
+      <li><a href="#changelog">Changelog</a></li>
+      <li><a href="https://github.com/douglasrac/Upward">GitHub</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <div>
+      <span class="eyebrow">v1.3.0 · BepInEx 5 · Project Highrise</span>
+      <h1>A tower that <em>sleeps</em> at night.</h1>
+      <p class="lede">Upward is a free mod for Project Highrise. After closing time, shops pull their shutters down and lights follow the people inside. Building also takes a lot fewer clicks, and nothing in the original game is replaced.</p>
+      <div class="cta">
+        <a class="btn btn-primary" href="https://github.com/douglasrac/Upward/releases/latest">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 21h16"/></svg>
+          Download Upward
+        </a>
+        <a class="btn btn-ghost" href="#install">How to install</a>
+      </div>
+      <p class="meta">Steam, Windows · BepInEx is included in the download · free and open source</p>
+    </div>
+
+    <figure class="clip hero-clip">
+      <video src="video/night.mp4" poster="video/night.jpg" autoplay muted loop playsinline preload="metadata" aria-label="In-game footage: shops closing their shutters and lights going off at night"></video>
+      <figcaption>In game: shops close and lights go off as night falls.</figcaption>
+    </figure>
+  </div>
+</header>
+
+<section id="features">
+  <div class="wrap">
+    <span class="kicker">Features</span>
+    <h2>Everything Upward changes</h2>
+    <p class="sub">Every feature can be switched off or tuned in the config file.</p>
+
+    <div class="groups">
+      <div>
+        <div class="group-head"><h3>Night life</h3><span>the tower follows the clock</span></div>
+        <div class="cards">
+          <div class="card"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 21h18M5 21V8l7-4 7 4v13M8 12h8M8 15h8M8 18h8"/></svg></div>
+            <h3>Shops close for real</h3><p>After hours, every store and restaurant pulls down an animated steel shutter, turns its lights off and shows a CLOSED sign. 69 of the 71 storefronts have their own hand-made closed facade.</p></div>
+          <div class="card"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 5 6 9H3v6h3l5 4V5zM15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg></div>
+            <h3>Shutter sounds</h3><p>Real garage-door recordings play when a shop opens or closes. You only hear the ones on screen, louder when you zoom in and panned left or right. They follow the game's effects volume.</p></div>
+          <div class="card"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-6 9 6v12H3zM9 21v-6h6v6"/></svg></div>
+            <h3>Apartments follow residents</h3><p>Lights stay on only while someone is awake at home. They go off when everyone leaves or goes to bed, with a short delay so they don't flicker. You can switch to a fixed schedule instead.</p></div>
+          <div class="card"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 4v16"/></svg></div>
+            <h3>Offices, services and hotels</h3><p>Offices switch their lights off one by one after work hours. Services like the spa, gallery and florist dim their lights when closed, and vacant hotel rooms stay dark.</p></div>
+          <div class="card"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 13A9 9 0 1 1 11 3a7 7 0 0 0 10 10z"/></svg></div>
+            <h3>Rooftop terraces</h3><p>Rooftop restaurants get a night-blue tint at night instead of a shutter, so the sky behind them stays visible.</p></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="group-head"><h3>Less busywork</h3><span>fewer clicks to build</span></div>
+        <figure class="clip feature-clip">
+          <video src="video/build.mp4" poster="video/build.jpg" controls muted loop playsinline preload="metadata" aria-label="In-game footage: dragging to build several rooms, then Shift+click to furnish them all"></video>
+          <figcaption>Drag to build a row of rooms, then <kbd>Shift</kbd>+click to furnish them all at once.</figcaption>
+        </figure>
+        <div class="cards">
+          <div class="card"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12h18M15 6l6 6-6 6"/><rect x="3" y="4" width="5" height="5" rx="1"/></svg></div>
+            <h3>Drag to build rooms</h3><p>Select a room and drag across a floor to build several side by side. A single click still works as before.</p></div>
+          <div class="card"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 18v-6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v6M2 18h20M6 10V7a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v3"/></svg></div>
+            <h3>Furnish all at once</h3><p><kbd>Shift</kbd>+click a furnishing option to furnish every other vacant hotel room or apartment of the same type and size. Each one is charged until you run out of money.</p></div>
+          <div class="card"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m14 4 6 6M17 7l-9 9-4 1 1-4 9-9"/></svg></div>
+            <h3>Pipette</h3><p>Press <kbd>V</kbd> or use the new HUD button, then click anything already built to start building the same item. No more digging through the build menu.</p></div>
+          <div class="card"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></div>
+            <h3>Automatic utility lines</h3><p>A finished electrical or plumbing closet lays its lines across the whole floor for free, so you only pay for the closet. Old saves get completed when you load them.</p></div>
+          <div class="card"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 20V10M18 20V4M6 20v-4"/></svg></div>
+            <h3>Bigger utility meters</h3><p>Power, water, cable, gas and phone hookups supply 25 / 100 / 300 instead of 10 / 50 / 150. HVAC is unchanged.</p></div>
+          <div class="card"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 10h18M6 10v10M18 10v10M3 20h18M9 6h6l-1-3h-4z"/></svg></div>
+            <h3>Shops underground <span class="new">NEW</span></h3><p>The Ice Cream Stand, Smoothie Bar, art rooms and indoor artwork can now be built below ground.</p></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="group-head"><h3>Noise, smell and services</h3><span>a calmer building</span></div>
+        <div class="cards">
+          <div class="card"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 5 6 9H3v6h3l5 4V5zM22 9l-6 6M16 9l6 6"/></svg></div>
+            <h3>Soundproof floors <span class="new">NEW</span></h3><p>Press <kbd>F8</kbd> and drag over built floor to soundproof it tile by tile. Noise on painted tiles is cleared and stops spreading up and down. Hold <kbd>Shift</kbd> to remove.</p></div>
+          <div class="card"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M8 15l2 2 4-4"/></svg></div>
+            <h3>Auto booking for events</h3><p>Press <kbd>F9</kbd> to put event spaces on autopilot with your ticket price. A free space books the cheapest performer or corporate event, but only when a performer suite is free.</p></div>
+          <div class="card"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 12h16M8 8c0-2 2-2 2-4M14 8c0-2 2-2 2-4M4 16h16"/></svg></div>
+            <h3>Smell stays on its floor</h3><p>Restaurant smell spreads sideways only, never up or down.</p></div>
+          <div class="card"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18v3h3l6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/></svg></div>
+            <h3>Fewer service requests</h3><p>Apartments and offices ask for plumbers, florists, IT and so on 40% less often. Hotel rooms are unchanged.</p></div>
+          <div class="card"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5M16 5a3 3 0 0 1 0 6M21 20c0-2-1.5-4-4-4.7"/></svg></div>
+            <h3>More hotel staff</h3><p>Housekeeping, Room Service Kitchen and Luggage Service get 1.5× the workers. This also applies to services in old saves.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="storefronts">
+  <div class="wrap">
+    <span class="kicker">Storefronts</span>
+    <h2>A closed facade for every shop</h2>
+    <p class="sub">These are a few of the 69 hand-made facades the mod shows when a store closes for the night. Scroll sideways to walk down the street.</p>
+    <div class="street" tabindex="0" aria-label="Closed storefront gallery">
+      <figure><img src="img/restaurant-level-one-a.jpg" width="400" height="300" alt="Cafe and Bakery, closed for the night" loading="lazy"><figcaption>Cafe and Bakery</figcaption></figure>
+      <figure><img src="img/retail-level-two-c-shoes.jpg" width="1200" height="300" alt="Shoe store with shutter half down and a CLOSED sign" loading="lazy"><figcaption>Shoe store</figcaption></figure>
+      <figure><img src="img/retail-level-one-e-flowers.jpg" width="700" height="300" alt="Florist, closed" loading="lazy"><figcaption>Florist</figcaption></figure>
+      <figure><img src="img/restaurant-level-three-b-italian.jpg" width="1600" height="300" alt="Italian trattoria after closing" loading="lazy"><figcaption>Italian restaurant</figcaption></figure>
+      <figure><img src="img/retail-level-three-a.jpg" width="1200" height="600" alt="Two-floor department store, closed" loading="lazy"><figcaption>Two-floor store</figcaption></figure>
+      <figure><img src="img/restaurant-level-two-a.jpg" width="800" height="300" alt="Restaurant, closed" loading="lazy"><figcaption>Restaurant</figcaption></figure>
+      <figure><img src="img/retail-level-one-a.jpg" width="700" height="300" alt="Small shop, closed" loading="lazy"><figcaption>Small shop</figcaption></figure>
+      <figure><img src="img/restaurant-level-four-a.jpg" width="1400" height="300" alt="Fine dining restaurant, closed" loading="lazy"><figcaption>Fine dining</figcaption></figure>
+      <figure><img src="img/retail-level-four-a.jpg" width="800" height="300" alt="Boutique, closed" loading="lazy"><figcaption>Boutique</figcaption></figure>
+      <figure><img src="img/restaurant-level-three-c-brunch.jpg" width="1600" height="300" alt="Brunch restaurant, closed" loading="lazy"><figcaption>Brunch place</figcaption></figure>
+      <figure><img src="img/retail-level-two-a.jpg" width="1200" height="300" alt="Store, closed" loading="lazy"><figcaption>Store</figcaption></figure>
+      <figure><img src="img/restaurant-level-two-e.jpg" width="800" height="300" alt="Restaurant, closed" loading="lazy"><figcaption>Diner</figcaption></figure>
+    </div>
+    <p class="gallery-note">Want your own art? Replace any PNG in <code>plugins\Upward\textures\closed\</code> with an image of the same size.</p>
+  </div>
+</section>
+
+<section id="install">
+  <div class="wrap">
+    <span class="kicker">Install</span>
+    <h2>One zip, about a minute</h2>
+    <p class="sub">BepInEx, the mod loader Upward runs on, is already inside the download.</p>
+    <div class="install">
+      <ol class="steps">
+        <li><strong>Download <code>Upward-1.3.0.zip</code></strong><p>Get it from the <a href="https://github.com/douglasrac/Upward/releases/latest">Releases page</a>.</p></li>
+        <li><strong>Open the game folder</strong><p>In Steam, right-click <em>Project Highrise → Manage → Browse local files</em>. It's the folder with <code>Game.exe</code>.</p></li>
+        <li><strong>Extract the zip into that folder</strong><p>Let it merge folders.</p></li>
+        <li><strong>Play</strong><p>Start the game from Steam as usual. To check that the mod loaded, look for <code>Upward 1.3.0 carregado</code> in <code>BepInEx\LogOutput.log</code>.</p></li>
+      </ol>
+      <div>
+<pre><span class="c">Project Highrise\</span>
+├─ Game.exe
+├─ <span class="h">winhttp.dll</span>            <span class="c">BepInEx</span>
+├─ <span class="h">doorstop_config.ini</span>    <span class="c">BepInEx</span>
+└─ <span class="h">BepInEx\</span>
+   ├─ core\
+   └─ plugins\
+      └─ <span class="h">Upward\</span>
+         ├─ Upward.dll
+         ├─ sounds\
+         └─ textures\</pre>
+        <div class="note"><strong>Already use BepInEx?</strong> Download <code>Upward-1.3.0-plugin-only.zip</code> and extract it into <code>BepInEx\plugins\</code>. Project Highrise is a 32-bit game, so you need the <strong>x86</strong> build of BepInEx. The x64 build won't load.</div>
+        <div class="note"><strong>Uninstall:</strong> delete <code>BepInEx\plugins\Upward</code>. Your saves keep working: utility lines and furniture the mod placed are normal game objects.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="config">
+  <div class="wrap">
+    <span class="kicker">Configuration</span>
+    <h2>Turn anything off</h2>
+    <p class="sub">After the first launch, open <code>BepInEx\config\upward.projecthighrise.cfg</code> in any text editor while the game is closed. Section and key names are in Portuguese, so here's what each one means.</p>
+    <details>
+      <summary>All settings (29)</summary>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Section</th><th>Key</th><th>Default</th><th>What it does</th></tr></thead>
+          <tbody>
+            <tr><td>Lojas</td><td><code>ArteDeFechada</code></td><td>true</td><td>Shutter, lights off and CLOSED sign after hours</td></tr>
+            <tr><td>Lojas</td><td><code>EscritoriosApagamLuzes</code></td><td>true</td><td>Offices turn their lights off after hours</td></tr>
+            <tr><td>Lojas</td><td><code>ServicosApagamLuzes</code></td><td>true</td><td>Services dim their lights after hours</td></tr>
+            <tr><td>Lojas</td><td><code>DuracaoAnimacaoPorta</code></td><td>0.6</td><td>Shutter animation length (real seconds)</td></tr>
+            <tr><td>Hotel</td><td><code>QuartosVagosApagados</code></td><td>true</td><td>Vacant hotel rooms are dark</td></tr>
+            <tr><td>Apartamentos</td><td><code>ApagarDeMadrugada</code></td><td>true</td><td>Apartments turn their lights off</td></tr>
+            <tr><td>Apartamentos</td><td><code>SeguirMoradores</code></td><td>true</td><td>Lights follow residents; <code>false</code> uses fixed hours</td></tr>
+            <tr><td>Apartamentos</td><td><code>DuracaoLuz</code></td><td>0.2</td><td>Light fade time (real seconds)</td></tr>
+            <tr><td>Apartamentos</td><td><code>AtrasoApagarMinutos</code></td><td>3</td><td>Game minutes to wait before lights go off</td></tr>
+            <tr><td>Apartamentos</td><td><code>HoraApagar</code></td><td>0</td><td>Lights-off hour with fixed hours (23.5 = 23:30)</td></tr>
+            <tr><td>Apartamentos</td><td><code>HoraAcender</code></td><td>6</td><td>Lights-on hour with fixed hours</td></tr>
+            <tr><td>Cheiro</td><td><code>NaoPassaEntreAndares</code></td><td>true</td><td>Smell does not spread between floors</td></tr>
+            <tr><td>Sons</td><td><code>Ativado</code></td><td>true</td><td>Enable Upward's sounds</td></tr>
+            <tr><td>Sons</td><td><code>Volume</code></td><td>0.8</td><td>Volume of Upward's sounds (0–1)</td></tr>
+            <tr><td>Utilidades</td><td><code>LinhasAutomaticas</code></td><td>true</td><td>Closets lay their lines across the floor for free</td></tr>
+            <tr><td>Utilidades</td><td><code>CompletarSavesAntigos</code></td><td>true</td><td>Complete utility lines when loading a save</td></tr>
+            <tr><td>Utilidades</td><td><code>LigacoesMaiores</code></td><td>true</td><td>Bigger utility meter capacities</td></tr>
+            <tr><td>Ruido</td><td><code>LajeAntirruido</code></td><td>true</td><td>Enable soundproof floor painting</td></tr>
+            <tr><td>Ruido</td><td><code>PrecoPorCasa</code></td><td>200</td><td>Soundproofing price per tile</td></tr>
+            <tr><td>Ruido</td><td><code>Tecla</code></td><td>F8</td><td>Key for soundproofing mode</td></tr>
+            <tr><td>Construcao</td><td><code>ArrastarSalas</code></td><td>true</td><td>Drag to build rooms</td></tr>
+            <tr><td>Construcao</td><td><code>MobiliarTodos</code></td><td>true</td><td>Shift+click to furnish all vacant spaces</td></tr>
+            <tr><td>Construcao</td><td><code>ContaGotas</code></td><td>true</td><td>Pipette button</td></tr>
+            <tr><td>Construcao</td><td><code>TeclaContaGotas</code></td><td>V</td><td>Key that arms the pipette</td></tr>
+            <tr><td>Construcao</td><td><code>LojasNoSubsolo</code></td><td>true</td><td>Allow some shops and art underground</td></tr>
+            <tr><td>Eventos</td><td><code>BookingAutomatico</code></td><td>true</td><td>Auto booking panel for event spaces</td></tr>
+            <tr><td>Eventos</td><td><code>Tecla</code></td><td>F9</td><td>Key for the auto booking panel</td></tr>
+            <tr><td>Servicos</td><td><code>FrequenciaPedidos</code></td><td>0.6</td><td>Service request frequency (1 = original game)</td></tr>
+            <tr><td>Servicos</td><td><code>FuncionariosHotel</code></td><td>1.5</td><td>Hotel service staff multiplier (1 = original game)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
+  </div>
+</section>
+
+<section id="changelog">
+  <div class="wrap">
+    <span class="kicker">Changelog</span>
+    <h2>What's new</h2>
+    <p class="sub">Full release notes and older downloads are on <a href="https://github.com/douglasrac/Upward/releases">GitHub Releases</a>.</p>
+    <div class="log">
+      <div class="rel"><h3>1.3.0 <small>Oct 2026</small></h3><ul>
+        <li>Soundproof floors are now painted tile by tile with click and drag, and Shift+drag removes them. Old saves are converted.</li>
+        <li>Ice cream, smoothie, art rooms and indoor art can be built underground.</li></ul></div>
+      <div class="rel"><h3>1.2.0 <small>Oct 2026</small></h3><ul>
+        <li>New pipette tool (<kbd>V</kbd>): click something built to build another one.</li></ul></div>
+      <div class="rel"><h3>1.1.0 <small>Oct 2026</small></h3><ul>
+        <li>Auto booking for event spaces (<kbd>F9</kbd>).</li>
+        <li>Mod panels no longer let clicks through to the game.</li></ul></div>
+      <div class="rel"><h3>1.0.0 <small>Oct 2026</small></h3><ul>
+        <li>The download now includes BepInEx x86, so it's a single zip to extract.</li>
+        <li>New plugin-only zip for players who already have BepInEx.</li></ul></div>
+      <div class="rel"><h3>0.1.0 <small>Oct 2026</small></h3><ul>
+        <li>First public release.</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>Upward is an unofficial fan mod, not affiliated with or endorsed by SomaSim or Kasedo Games. Project Highrise is © SomaSim.</p>
+    <p>Built with <a href="https://github.com/BepInEx/BepInEx">BepInEx</a> and <a href="https://github.com/pardeike/Harmony">Harmony</a>. The shutter sounds are "Garage door closing/opening" by ezwa (PDSounds), public domain.</p>
+    <p><a href="https://github.com/douglasrac/Upward">Source code on GitHub</a> · <a href="https://github.com/douglasrac/Upward/issues">Report a bug</a></p>
+  </div>
+</footer>
+
+</body>
+</html>
