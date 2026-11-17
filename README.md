@@ -3,6 +3,8 @@
 **The ultimate mod for Project Highrise.** Upward is a [BepInEx 5](https://github.com/BepInEx/BepInEx) plugin that makes your tower feel alive at night and removes a lot of the tedious clicking from building — without replacing the original game.
 
 > Version 1.3.0 · Project Highrise (Steam, Windows) · BepInEx 5.4.23 **x86**
+>
+> **Website, with gameplay videos:** https://douglasrac.github.io/Upward/
 
 ---
 
