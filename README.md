@@ -11,7 +11,7 @@
 ## Features
 
 ### A tower that sleeps at night
-- **Shops and restaurants close for real.** Outside their working hours, every store and restaurant pulls down a steel shutter with an animation, its lights go off and a **CLOSED** sign appears. 69 of the 71 storefronts have their own hand-made "closed" facade; the rest fall back to a generic shutter.
+- **Shops and restaurants close for real.** Outside their working hours, every store and restaurant pulls down a steel shutter with an animation, its lights go off and a **CLOSED** sign appears. 69 of the 71 storefronts have their own "closed" facade; the rest fall back to a generic shutter.
 - **Shutter sounds.** Real public-domain garage-door recordings play when a shop opens or closes. Sounds are positional (only heard when on screen, louder when zoomed in, panned left/right) and follow the game's effects volume.
 - **Rooftop restaurants** (terraces) are dimmed to a night-blue tint instead of being covered, so the sky behind them stays visible.
 - **Offices turn their lights off** gradually after work hours.
